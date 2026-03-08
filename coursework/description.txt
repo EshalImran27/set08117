@@ -1,0 +1,6 @@
+This is for myself to keep myself updated on why i made a particular descision and when i am thinking to change it and why?
+1. FOR UNDO REDO:
+    not decided on vector bcos vector allows access anywhere in the stack but STACK allows only last element access which we need for 
+    undo REDO
+    then decided on using 4 stacks rather than 2 bcos dont wanna mix pl1 pl2 moves 
+    might accidentally undo redo another pl move. 
