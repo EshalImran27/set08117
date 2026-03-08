@@ -5,9 +5,14 @@
 #include <ctime> // for time-based seeding
 #include <windows.h> // for Sleep
 #include <sstream> // for stringstream
+#include <stack> // for undo/redo stacks
 using namespace std; 
 #define HEIGHT 6 
 #define WIDTH 7
+struct Move {
+    int col; 
+    int row;
+};
 int board_info[HEIGHT][WIDTH] = { {0,0,0,0,0,0,0},
                                  {0,0,0,0,0,0,0},
                                  {0,0,0,0,0,0,0},
@@ -16,6 +21,10 @@ int board_info[HEIGHT][WIDTH] = { {0,0,0,0,0,0,0},
                                  {0,0,0,0,0,0,0} };
 int LastMoveX, LastMoveY, gameNumber;
 string player1, player2, winner, gameMode;
+stack <Move> undoStackPlayer1;
+stack <Move> redoStackPlayer1;
+stack <Move> undoStackPlayer2;
+stack <Move> redoStackPlayer2;
 void EasyMode();
 void menu();
 void reset_board();
@@ -56,28 +65,39 @@ void draw_board(){
     }
 }
 void player_movement(string player, int player_symbol){
-    int choice;
+    int playerChoice,move;
+    cout<<"Select a choice:\n";
+    cout<<"1. Place a piece\t 2. Undo\t 3. Redo\n";
+    cin >> playerChoice;
+    if (cin.fail()){
+        cin.clear();
+        cin.ignore(1000, '\n');
+        cout << "Invalid input. Please try again." << endl;
+        player_movement(player, player_symbol);
+        return;
+    }
+    if (playerChoice == 1){
     cout << "\n" << player << ", please select a number from 1 - 7: ";
-    cin >> choice;
+    cin >> move;
     //Error Checking
     if (cin.fail()){
         cout << "Error!";
         exit(1);
     }
-    while (choice > WIDTH || choice <= 0){
+    while (move > WIDTH || move <= 0){
         cout << "\nPlease select again: ";
-        cin >> choice;
+        cin >> move;
         if (cin.fail()){
             cout << "Error!";
             exit(1);
         }
     }
     int number = 0;
-    while (board_info[(HEIGHT - 1) - number][(choice - 1)] != 0){
+    while (board_info[(HEIGHT - 1) - number][(move - 1)] != 0){
         number++;
         if (number > (HEIGHT - 1)){
             cout << "\nPlease select again: ";
-            cin >> choice;
+            cin >> move;
             if (cin.fail()){
                 cout << "Error!";
                 exit(1);
@@ -85,11 +105,86 @@ void player_movement(string player, int player_symbol){
             number = 0;  // reset
         }
     };
-    board_info[(HEIGHT - 1) - number][choice - 1] = player_symbol;
+    board_info[(HEIGHT - 1) - number][move - 1] = player_symbol;
     LastMoveY = (HEIGHT - 1) - number;
-    LastMoveX = choice - 1;
+    LastMoveX = move - 1;
+    Move m = {LastMoveX, LastMoveY};   
     // save the last move of the player as soon as the move is made for replay purposes
-    saveGameMoves(getGameNumber(), player_symbol, choice);
+    saveGameMoves(getGameNumber(), player_symbol, move);
+    if(player_symbol ==1){
+        undoStackPlayer1.push(m);
+        redoStackPlayer1 = stack<Move>(); // clear redo stack when a new move is made
+    }
+    else if(player_symbol ==2){
+        undoStackPlayer2.push(m);
+        redoStackPlayer2 = stack<Move>(); // clear redo stack when a new move is made
+    }
+}
+    else if (playerChoice == 2){
+        cout << "Undoing last move...\n";
+        if(player_symbol == 1){
+            if(!undoStackPlayer1.empty()){
+                Move m = undoStackPlayer1.top();
+                undoStackPlayer1.pop();
+                board_info[m.row][m.col]=0;
+                redoStackPlayer1.push(m);
+            }
+            else{
+                cout << "No moves to undo.\n";
+                player_movement(player, player_symbol);
+                return;
+            }
+        }
+        else if(player_symbol == 2){
+            if(!undoStackPlayer2.empty()){
+                Move m = undoStackPlayer2.top();
+                undoStackPlayer2.pop();
+                board_info[m.row][m.col]=0;
+                redoStackPlayer2.push(m);
+            }
+            else{
+                cout << "No moves to undo.\n";
+                player_movement(player, player_symbol);
+                return;
+            }
+        }
+        
+    }
+    else if (playerChoice == 3){
+        cout << "Redoing last undone move...\n";
+        // redo logic to be implemented
+        if(player_symbol == 1){
+            if(!redoStackPlayer1.empty()){
+                Move m = redoStackPlayer1.top();
+                redoStackPlayer1.pop();
+                board_info[m.row][m.col]=1;
+                undoStackPlayer1.push(m);
+            }
+            else{
+                cout << "No moves to redo.\n";
+                player_movement(player, player_symbol);
+                return;
+            }
+        }
+        else if(player_symbol == 2){
+            if(!redoStackPlayer2.empty()){
+                Move m = redoStackPlayer2.top();
+                redoStackPlayer2.pop();
+                board_info[m.row][m.col]=2;
+                undoStackPlayer2.push(m);
+            }
+            else{
+                cout << "No moves to redo.\n";
+                player_movement(player, player_symbol);
+                return;
+            }
+        }
+    }
+    else{
+        cout << "Invalid choice. Please select again.\n";
+        player_movement(player, player_symbol);
+        return;
+    }
 }
 bool saveGameMoves(int gameNumber, int player_symbol, int column){
     string movesFilename = "game_moves.csv";
@@ -245,8 +340,8 @@ void menu(){
     // reset the board and game state variables in case coming back from a finished game or replay
     reset_board();
     cout<<"Please select an option:\n";
-    cout<<"1. Start Game\t 2. replay a game\n";
-    cout<<"3. see the scoreboard \t4. How to play?\n";
+    cout<<"1. Start Game\t 2. Replay a game\n";
+    cout<<"3. See the scoreboard \t4. How to play?\n";
     cout<<"5. Exit\n";
     cout<<"Enter your choice: ";
     int choice;
