@@ -1,5 +1,12 @@
- #include "globals.h"
+#include "globals.h"
 
+//void EasyMode();
+//void menu();
+int LastMoveX=0, LastMoveY=0, gameNumber=1;
+string player1, player2, winner, gameMode;
+stack <Move> undoStack;
+stack <Move> redoStack;
+int board_info[HEIGHT][WIDTH] = {0}; // initialize the board with 0s, which represent empty spaces
 int main(){
     cout<<"Welcome to Ultimate Connect 4!\n";
     cout<<"Let's get started!\n";
@@ -31,6 +38,14 @@ void EasyMode(){
             menu();
             break;
         }
+        if(LastMoveX == 0 && LastMoveY == 0 && board_info[LastMoveY][LastMoveX] != 0){ // if the top left corner is filled and was the last move, the board is full and it's a draw
+            cout << "It's a draw! Well played both!\n";
+            winner = "Draw";
+            saveGameInfo(player1, player2, winner);
+            menu();
+            break;
+        }
+
     }
 }
 void menu(){

@@ -14,23 +14,21 @@ using namespace std;
 struct Move {
     int col; 
     int row;
+    int player_symbol; // 1 for player 1, 2 for player 2
 };
-int board_info[HEIGHT][WIDTH] = { {0,0,0,0,0,0,0},
-                                 {0,0,0,0,0,0,0},
-                                 {0,0,0,0,0,0,0},
-                                 {0,0,0,0,0,0,0},
-                                 {0,0,0,0,0,0,0},
-                                 {0,0,0,0,0,0,0} };
-int LastMoveX, LastMoveY, gameNumber;
-string player1, player2, winner, gameMode;
-stack <Move> undoStackPlayer1;
-stack <Move> redoStackPlayer1;
-stack <Move> undoStackPlayer2;
-stack <Move> redoStackPlayer2;
-void EasyMode();
-void menu();
+extern int board_info[HEIGHT][WIDTH];
+extern int LastMoveX, LastMoveY, gameNumber;
+extern string player1, player2, winner, gameMode;
+extern stack <Move> undoStack;
+extern stack <Move> redoStack;
+/*extern stack <Move> undoStackPlayer1;
+extern stack <Move> redoStackPlayer1;
+extern stack <Move> undoStackPlayer2;
+extern stack <Move> redoStackPlayer2;*/
 void reset_board();
 void draw_board();
+void menu();
+void EasyMode();
 bool check_horizontal_combo(int x, int y, int player_symbol);
 bool check_vertical_combo(int x, int y, int player_symbol);
 bool check_diagonal_combo_SW_NE(int x, int y, int player_symbol);
