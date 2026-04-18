@@ -1,6 +1,6 @@
 #include "globals.h"
 
-bool saveGameMoves(int gameNumber, int player_symbol, int column){
+bool saveGameMoves(int gameNumber, int player_symbol,  int column,  int row, string action){
     string movesFilename = "game_moves.csv";
     ofstream outfile("game_moves.csv", ios::app);
      if(!outfile.is_open()){
@@ -8,7 +8,7 @@ bool saveGameMoves(int gameNumber, int player_symbol, int column){
             return false;
     }
     //might add some other things to log later like undo redo moves.
-    outfile << gameNumber << "," << player_symbol << "," << column << "\n";
+    outfile << gameNumber << "," << player_symbol << "," << column << "," << row << "," << action << "\n";
     outfile.close();
     return true;
 }
