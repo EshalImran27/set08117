@@ -1,12 +1,5 @@
 #include "globals.h"
 void draw_board(){
-    cout << "| ";
-    for (int i = 1; i <= WIDTH; i++){
-        if(i==frozenColumn) cout << "(F)" << i << " | "; // indicate the frozen column in medium mode
-        else
-            cout << " " << i << " | ";
-    }
-    cout << endl;
     cout << "| 1 | 2 | 3 | 4 | 5 | 6 | 7 |" << endl;
     cout << "-----------------------------"<<endl;
     for(int i=0;i<HEIGHT;i++){

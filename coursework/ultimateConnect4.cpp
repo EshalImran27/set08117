@@ -8,7 +8,8 @@ void enableANSI()
 }
 //void EasyMode();
 //void menu();
-int LastMoveX=0, LastMoveY=0, gameNumber=1, frozenColumn=-1; // initialize frozenColumn to -1 to indicate no column is currently frozen
+int LastMoveX=0, LastMoveY=0, gameNumber=1, frozenColumn=-1, pl1Moves=0, pl2Moves=0 ; // initialize frozenColumn to -1 to indicate no column is currently frozen
+bool hasFreezepl1=false, hasFreezepl2=false; // initialize freeze power flags to false at the start of the game
 string player1, player2, winner, gameMode;
 stack <Move> undoStackPlayer1;
 stack <Move> redoStackPlayer1;
@@ -62,18 +63,71 @@ void EasyMode(){
 
     }
 }
-
-// void MediumMode(){
-//     gameMode = "Medium";
-//     frozenColumn = -1; // initialize frozenColumn to -1 to indicate no column is currently frozen at the start of the game
-//     int movesPlayer1 = 0; // keep track of the number of moves made by player 1
-//     int movesPlayer2 = 0; // keep track of the number of moves made by
+void MediumMode(){
+    gameMode = "Medium";
+    frozenColumn = -1; // initialize frozenColumn to -1 to indicate no column is currently frozen at the start of the game
+    draw_board();
+    while(true){
+        player_movement_medium(player1, 1);
+        draw_board();
+        if (check_for_winner(LastMoveX, LastMoveY, 1)){
+            draw_board();
+            cout << player1 << " wins! Congratulations!\n";
+            winner = player1;
+            //save the game information to the log as soon as we know the winner so that even if the program crashes later we have a record of the game and its outcome; also allows replaying even if the program is closed right after the game ends
+            saveGameInfo(player1, player2, winner);
+            menu();
+            break;
+        }
+        {
+            bool full=true;
+            for(int i=0;i<WIDTH;i++){
+                if(board_info[0][i] == 0) {
+                    full=false; // if there's an empty space in the top row, the board is not full yet
+                    break;
+                }
+            }
+            if(full){ // if we reached the end of the loop and all spaces in the top row are filled, it's a draw
+                cout << "It's a draw! Well played both!\n";
+                winner = "Draw";
+                saveGameInfo(player1, player2, winner);
+                menu();
+                break;
+            }
+        }
+        player_movement_medium(player2, 2);
+        draw_board();
+        if (check_for_winner(LastMoveX, LastMoveY, 2)){
+            draw_board();
+            cout << player2 << " wins! Congratulations!\n";
+            winner = player2;
+            saveGameInfo(player1, player2, winner);
+            menu();
+            break;
+        }
+        {
+            bool full=true;
+            for(int i=0;i<WIDTH;i++){
+                if(board_info[0][i] == 0) {
+                    full=false; // if there's an empty space in the top row, the board is not full yet
+                    break;
+                }
+            }
+            if(full){ // if we reached the end of the loop and all spaces in the top row are filled, it's a draw
+                cout << "It's a draw! Well played both!\n";
+                winner = "Draw";
+                saveGameInfo(player1, player2, winner);
+                menu();
+                break;
+            }
+        }
+    }
+}
+// void HardMode(){
+//     gameMode = "Hard";
 //     draw_board();
-//     while(true){
-//         bool p1Frozen=false;
-//         player_movement_medium(player1, 1, frozenColumn);
-//         movesPlayer1++;
-//         frozenColumn = -1; // reset frozen column after player 1's turn
+//    while(true){
+//         player_movement_hard(player1, 1);
 //         draw_board();
 //         if (check_for_winner(LastMoveX, LastMoveY, 1)){
 //             draw_board();
@@ -100,18 +154,7 @@ void EasyMode(){
 //                 break;
 //             }
 //         }
-//         if(movesPlayer1 % 5 == 0){
-//             int freezeChoice= offerFreeze(player1, 1);
-//             if(freezeChoice != -1){ // if the player chose to freeze a column
-//                 frozenColumn = freezeChoice;
-//                 saveGameMoves(getGameNumber(), 1, frozenColumn + 1, "FREEZE"); // log using 1-based column
-//                 cout << player1 << " has frozen column " << frozenColumn << " for the next turn of " << player2 << "!\n";
-//                 draw_board();
-//             }
-//         }
-//         player_movement_medium(player2, 2, frozenColumn);
-//         movesPlayer2++;
-//         frozenColumn = -1; // reset frozen column after player 2's turn
+//         player_movement_hard(player2, 2);
 //         draw_board();
 //         if (check_for_winner(LastMoveX, LastMoveY, 2)){
 //             draw_board();
@@ -135,15 +178,6 @@ void EasyMode(){
 //                 saveGameInfo(player1, player2, winner);
 //                 menu();
 //                 break;
-//             }
-//         }
-//         if(movesPlayer2 % 5 == 0){
-//             int freezeChoice= offerFreeze(player2, 2);
-//             if(freezeChoice != -1){ // if the player chose to freeze a column
-//                 frozenColumn = freezeChoice;
-//                 saveGameMoves(getGameNumber(), 2, frozenColumn + 1, "FREEZE"); // log using 1-based column
-//                 cout << player2 << " has frozen column " << frozenColumn << " for the next turn of " << player1 << "!\n";
-//                 draw_board();
 //             }
 //         }
 //     }
@@ -209,10 +243,17 @@ void menu(){
                 case 1:
                     cout<<"Easy mode selected. Good luck!\n";
                     EasyMode();
+                    winningCells.clear();
                     break;
                 case 2:
                     cout<<"Medium mode selected. Good luck!\n";
-                    //MediumMode();
+                    MediumMode();
+                    winningCells.clear();
+                    frozenColumn = -1; // reset frozen column for next game
+                    pl1Moves = 0; // reset player 1 move count for next game
+                    pl2Moves = 0; // reset player 2 move count for next game
+                    hasFreezepl1 = false; // reset player 1 freeze power for next game
+                    hasFreezepl2 = false; // reset player 2 freeze power for next game
                     break;
                 case 3:
                     cout<<"Hard mode selected. Good luck!\n";

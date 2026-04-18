@@ -28,13 +28,15 @@ struct Move {
 struct Cell { int row; int col; };
 extern vector<Cell> winningCells; // global variable to store the coordinates of the winning pieces for highlighting in the replay
 extern int board_info[HEIGHT][WIDTH];
-extern int LastMoveX, LastMoveY, gameNumber;
+extern int LastMoveX, LastMoveY, gameNumber, pl1Moves, pl2Moves;
 extern string player1, player2, winner, gameMode;
 extern stack <Move> undoStackPlayer1;
 extern stack <Move> redoStackPlayer1;
 extern stack <Move> undoStackPlayer2;
 extern stack <Move> redoStackPlayer2;
 extern int frozenColumn; // global variable to keep track of the frozen column in medium mode; -1 if no column is currently frozen
+extern bool hasFreezepl1; // flag to track if player 1 has earned the freeze power
+extern bool hasFreezepl2; // flag to track if player 2 has earned the freeze power
 void reset_board();
 void draw_board();
 void menu();
@@ -53,8 +55,9 @@ bool saveGameInfo(string player1, string player2, string winner);
 void deleteRecord();
 void gameReplay(int game_Number);
 bool saveGameMoves(int game_Number, int player_symbol, int column, int row, string action = "MOVE");
-void player_movement_medium(string player, int player_symbol, int frozenColumn);
-//int offerFreeze(string player, int player_symbol);
-static int offerFreeze(const string& player, int player_symbol);
+void player_movement_medium(string player, int player_symbol);
+void player_movement_hard(string player, int player_symbol);
+bool was3Blocked(int player_symbol, int column, int row); // function to check if the player has had a 3 in a row blocked by the opponent, which would earn them the freeze power in medium mode
+bool freezePower(int player_symbol);
 
 #endif

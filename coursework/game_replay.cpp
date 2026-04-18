@@ -41,6 +41,9 @@ void gameReplay(int gameNumber){
         if(gameNum != gameNumber) continue; // skip moves from other games
         if(actionStr == "UNDO"){
            board_info[row][col-1] = 0; // remove the piece from the board; log is saved using 1-based column and row so convert to 0-based for indexing the board
+        }else if(actionStr == "FREEZE"){
+            frozenColumn = col - 1; // set the global frozenColumn variable; log is saved using 1-based column so convert to 0-based for indexing
+
         }else {
         //if(action == "MOVE"){
             int num = 0;
@@ -51,6 +54,7 @@ void gameReplay(int gameNumber){
             if(num <= HEIGHT - 1){
                 board_info[(HEIGHT - 1) - num][(col - 1)] = symbol;
             }
+            frozenColumn = -1; // reset frozen column after the move is made
         }
         system("cls");
         draw_board();
