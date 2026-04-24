@@ -1,5 +1,6 @@
 #include "globals.h"
 void draw_board(){
+    cout<<"\n";
     cout << "| 1 | 2 | 3 | 4 | 5 | 6 | 7 |" << endl;
     cout << "-----------------------------"<<endl;
     for(int i=0;i<HEIGHT;i++){
@@ -33,4 +34,14 @@ void reset_board(){
     }
     LastMoveX = -1;
     LastMoveY = -1;
+    winningCells.clear();
+    frozenColumn = -1; // reset frozen column for next game
+    pl1Moves = 0; // reset player 1 move count for next game
+    pl2Moves = 0; // reset player 2 move count for next game
+    hasFreezepl1 = false; // reset player 1 freeze power for next game
+    hasFreezepl2 = false; // reset player 2 freeze power for next game
+    goPowerP1 = false; // reset player 1 GO power for next game
+    goPowerP2 = false; // reset player 2 GO power for next game
+    goPowerusedP1 = false; // reset player 1 GO power usage for next game
+    goPowerusedP2 = false; // reset player 2 GO power usage for next game
 }

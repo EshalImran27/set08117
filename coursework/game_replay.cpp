@@ -1,6 +1,40 @@
 #include "globals.h"
 
 void gameReplay(int gameNumber){
+    ifstream gamefile("game_log.csv");
+    if (!gamefile.is_open()){
+        cout << "Error: Could not open game_log.csv for reading." << endl;
+        return;
+    }
+    bool gameFound = false;
+    string line_1;
+    getline(gamefile, line_1); // skip header
+    while(getline(gamefile, line_1)){
+        if(line_1.empty()) continue;
+        stringstream ss(line_1);
+        string gameNumStr, player1Str, player2Str, winnerStr, gameModeStr;
+        getline(ss, gameNumStr, ',');
+        getline(ss, player1Str, ',');
+        getline(ss, player2Str, ',');
+        getline(ss, winnerStr, ',');
+        getline(ss, gameModeStr, ',');
+        
+        int gameNum = stoi(gameNumStr);
+        if(gameNum == gameNumber){
+            gameFound = true;
+            player1 = player1Str;
+            player2 = player2Str;
+            winner = winnerStr;
+            gameMode = gameModeStr;
+            break;
+        }
+    }
+    gamefile.close();
+    if(!gameFound){
+        cout << "Error: Game number " << gameNumber << " not found in log." << endl;
+        menu();
+        return;
+    }
     // AT FIRST I THOUGHT TO USE LINKED LIST TO STORE THE MOVES OF THE GAME TO MAKE REPLAYING EASIER BUT THEN DECIDED TO JUST READ FROM THE FILE DIRECTLY FOR SIMPLICITY SINCE THE FILE IS NOT EXPECTED TO BE VERY LARGE AND THIS WAY WE ALSO don't have to worry about memory management for the linked list
     ifstream infile("game_moves.csv");
     if (!infile.is_open()){
@@ -18,7 +52,7 @@ void gameReplay(int gameNumber){
     system("cls");
     winningCells.clear(); // clear winning cells in case replaying a game right after another one where there was a win, to avoid incorrectly highlighting pieces from the previous game
     draw_board();
-    Sleep(500);
+    Sleep(1000);
 // read each line in the file and when the game number matches the one we want to replay, make the move on the board and show the updated board;
 // if game number doesn't match, skip the line
     while(getline(infile, line)){
@@ -58,7 +92,7 @@ void gameReplay(int gameNumber){
         }
         system("cls");
         draw_board();
-        Sleep(500);
+        Sleep(1000);
     }
     infile.close();
     cout << "Replay finished.\n";

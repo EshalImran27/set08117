@@ -58,3 +58,58 @@ bool saveGameInfo(string player1, string player2, string winner){
     outfile.close();
     return true;
 }
+
+void cleanUnsavedMoves(){
+    ifstream logFile("game_log.csv");
+    int lastGameNum = 0;
+    if(logFile.is_open()){
+        string line;
+        getline(logFile, line); // skip header
+        while(getline(logFile, line)){
+            if(line.empty()) continue;
+            stringstream ss(line);
+            string gameNumStr;
+            getline(ss, gameNumStr, ',');
+            try{
+                int num= stoi(gameNumStr);
+                if(num > lastGameNum){
+                    lastGameNum = num;
+                }
+            }
+            catch(const invalid_argument& e){
+                cerr << "Error: Invalid game number in moves file." << endl;
+            }
+        }
+        logFile.close();
+    }
+    ifstream movesFile("game_moves.csv");
+    if(!movesFile.is_open()) return;
+
+    vector<string> validMoves;
+    string line;
+    while(getline(movesFile, line)){
+        if(line.empty()) continue;
+        stringstream ss(line);
+        string gameNumStr;
+        getline(ss, gameNumStr, ',');
+        try{
+            int num = stoi(gameNumStr);
+            if(num <= lastGameNum){
+                validMoves.push_back(line);
+            }
+        }
+        catch(const invalid_argument& e){
+            validMoves.push_back(line); // if the game number is invalid, we keep the move just in case it's from a future game that got logged before the game info for some reason, to avoid accidentally deleting valid moves
+        }
+    }
+    movesFile.close();
+    ofstream outMoves("game_moves.csv", ios::trunc);
+    if(!outMoves.is_open()){
+        cout << "Error: Could not open game_moves.csv for writing." << endl;
+        return;
+    }
+    for(const auto& move : validMoves){
+        outMoves << move << "\n";
+    }
+    outMoves.close();
+}

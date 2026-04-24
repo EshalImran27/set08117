@@ -1,4 +1,5 @@
 #include "globals.h"
+#include <iomanip>
 
 void scoreboard(){
     ifstream file("game_log.csv");
@@ -11,12 +12,23 @@ void scoreboard(){
     }
     else{
         string line;
-        cout << "GameNumber | DateTime | Player1 | Player2 | Winner | GameMode" << endl;
-        cout << "-------------------------------------------------------------" << endl;
+
+        cout << left << setw(12) << "GameNumber" << setw(28) << "DateTime" << setw(16) << "Player1" << setw(16) << "Player2" << setw(16) << "Winner" << setw(12) << "GameMode" << endl;
+        cout << string(12 + 28 + 16 + 16 + 16 + 12, '-') << endl;
         getline(file, line); // skip header
         while(getline(file, line)){
             if(!line.empty()){
-                cout << line << endl;
+                stringstream ss(line);
+                string gameNumberStr, dateTimeStr, player1Str, player2Str, winnerStr, gameModeStr;
+
+                getline(ss, gameNumberStr, ',');
+                getline(ss, dateTimeStr, ',');
+                getline(ss, player1Str, ',');
+                getline(ss, player2Str, ',');
+                getline(ss, winnerStr, ',');
+                getline(ss, gameModeStr, ',');
+
+                cout << left << setw(12) << gameNumberStr << setw(28) << dateTimeStr << setw(16) << player1Str << setw(16) << player2Str << setw(16) << winnerStr << setw(12) << gameModeStr << endl;
             }
         }
         file.close();
