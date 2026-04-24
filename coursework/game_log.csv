@@ -1,14 +1,11 @@
 GameNumber,DateTime,Player1,Player2,Winner,GameMode
 1,Wed Apr 22 16:50:52 2026,ee,aa,aa,Easy
-2,Wed Apr 22 17:15:19 2026,es,cc,cc,Easy
 3,Wed Apr 22 17:16:24 2026,1,w,w,Easy
 4,Wed Apr 22 17:18:32 2026,1,d,d,Easy
-5,Wed Apr 22 17:19:07 2026,d,d,d,Easy
 6,Wed Apr 22 17:20:39 2026,1,1,1,Easy
 7,Wed Apr 22 17:21:26 2026,1,1,1,Easy
 8,Wed Apr 22 17:22:36 2026,1,1,Draw,Easy
 9,Wed Apr 22 18:55:48 2026,es,ss,es,Easy
-10,Wed Apr 22 19:28:33 2026,wedwe,ewd,wedwe,Medium
 11,Wed Apr 22 19:33:00 2026,efedf,qwq,qwq,Medium
 12,Wed Apr 22 19:35:19 2026,ef3,wdw,wdw,Medium
 13,Wed Apr 22 19:40:02 2026,wef,dwed,dwed,Medium
@@ -21,3 +18,7 @@ GameNumber,DateTime,Player1,Player2,Winner,GameMode
 20,Thu Apr 23 00:02:39 2026,aaa,bbb,aaa,Hard
 21,Thu Apr 23 00:06:01 2026,eshal,minal,eshal,Hard
 22,Thu Apr 23 00:11:52 2026,min,esh,min,Medium
+22,Fri Apr 24 11:57:11 2026,sara,david,sara,Easy
+23,Fri Apr 24 11:58:52 2026,1,1,1,Easy
+24,Fri Apr 24 12:12:03 2026,qq,aa,qq,Medium
+25,Fri Apr 24 12:12:32 2026,ww,dd,ww,Medium

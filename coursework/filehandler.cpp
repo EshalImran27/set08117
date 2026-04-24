@@ -16,20 +16,30 @@ bool saveGameMoves(int gameNumber, int player_symbol,  int column,  int row, str
 int getGameNumber(){
     // the game number corresponds to the number of lines in the game_log.csv file (excluding header) + 1
     ifstream infile("game_log.csv");
-    int gameNum = 1;
+    int gameNum = 0;
     if(infile){
         string line;
-        int lineCount=0;
         getline(infile, line); // skip header
         while(getline(infile, line)){
-            if(!line.empty()){
-                lineCount++;
+            if(line.empty()){
+                continue;
+            }
+            int commaPos = line.find(',');
+            if(commaPos != string::npos){
+                try{
+                    int num = stoi(line.substr(0, commaPos));
+                    if(num > gameNum){
+                        gameNum = num;
+                    }
+                } catch(const invalid_argument& e){
+                    cerr << "Error: Invalid game number in log file." << endl;
+                    continue;
+                }
             }
         }
-        gameNum = lineCount + 1;
         infile.close();
     }
-    return gameNum;
+    return gameNum+1;
 }
 
 bool saveGameInfo(string player1, string player2, string winner){
