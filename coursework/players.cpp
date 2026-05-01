@@ -21,16 +21,35 @@ void player_movement(string player, int player_symbol){
             bool validMove = false;
             while(!validMove){
                 cout << "\n" << player << ", please select a number from 1 - 7: ";
+                //--------------------------------------------------
+                   if(frozenColumn != -1){
+            cout << "\n(Note: Column " << frozenColumn + 1 << " is frozen and cannot be selected this turn) ";
+        }
                 cin >> move;
-            // Error Checking
-                if (cin.fail()){
-                    cout << "Error!";
-                    cin.clear();
-                    cin.ignore(1000, '\n');
-                    continue;
-                }
-                if(move >= 1 && move <= WIDTH) validMove = true;
-                else cout << "Invalid choice. Please select again: ";
+                
+        if (cin.fail()){
+            cout << "Error!";
+            cin.clear();
+            cin.ignore(1000, '\n');
+            continue;
+        }
+        if(move-1 == frozenColumn){
+            cout << "\nColumn " << move << " is frozen. Please select another column: ";
+            continue;
+        }
+
+        if(move >= 1 && move <= WIDTH) validMove = true;
+        else cout << "Invalid choice. Please select again: ";
+        //..............................................................................
+            // // Error Checking
+            //     if (cin.fail()){
+            //         cout << "Error!";
+            //         cin.clear();
+            //         cin.ignore(1000, '\n');
+            //         continue;
+            //     }
+            //     if(move >= 1 && move <= WIDTH) validMove = true;
+            //     else cout << "Invalid choice. Please select again: ";
             }
             int number = 0;
             while (board_info[(HEIGHT - 1) - number][(move - 1)] != 0){
@@ -60,6 +79,15 @@ void player_movement(string player, int player_symbol){
                 undoStackPlayer2.push(m); // push the move onto the undo stack of player 2
                 redoStackPlayer2 = stack<Move>(); // clear the redo stack of player 2 since a new move has been made
             }
+            //--------------------------------------------------
+             frozenColumn = -1; // reset frozen column after the move is made
+    if(player_symbol == 1){
+        pl1Moves++;
+    }
+    else{
+        pl2Moves++;
+    }
+    //------------------------------------------------------------
             break;
         }
         case 2:{
@@ -170,54 +198,18 @@ void player_movement_medium(string player, int player_symbol){
         }
     }
     bool validMove = false;
-    while(!validMove){
-        cout << "\n" << player << ", please select a number from 1 - 7: ";
-        if(frozenColumn != -1){
-            cout << "\n(Note: Column " << frozenColumn + 1 << " is frozen and cannot be selected this turn) ";
-        }
-        cin >> move;
-        if (cin.fail()){
-            cout << "Error!";
-            cin.clear();
-            cin.ignore(1000, '\n');
-            continue;
-        }
-        if(move-1 == frozenColumn){
-            cout << "\nColumn " << move << " is frozen. Please select another column: ";
-            continue;
-        }
-
-        if(move >= 1 && move <= WIDTH) validMove = true;
-        else cout << "Invalid choice. Please select again: ";
-    }
-    int number = 0;
-    while (board_info[(HEIGHT - 1) - number][(move - 1)] != 0){
-        number++;
-        if (number > (HEIGHT - 1)){
-            cout << "\nPlease select again: ";
-            cin >> move;
-            if (cin.fail()){
-                cout << "Error!";
-                cin.clear();
-                cin.ignore(1000, '\n');
-                continue;
-            }
-            number = 0; // reset
-        }
-    };  
-    board_info[(HEIGHT - 1) - number][move - 1] = player_symbol;
-    LastMoveY = (HEIGHT - 1) - number;
-    LastMoveX = move - 1;
-    Move m = {LastMoveX, LastMoveY};
-    saveGameMoves(getGameNumber(), player_symbol, move, LastMoveY); // log using 1-based column and row
-    frozenColumn = -1; // reset frozen column after the move is made
-    if(player_symbol == 1){
-        pl1Moves++;
-    }
-    else{
-        pl2Moves++;
-    }
+    player_movement(player, player_symbol); // call the regular player movement function to get the player's move choice and handle undo/redo if selected
     draw_board();
+    if (check_for_winner(LastMoveX, LastMoveY, player_symbol)){
+        draw_board();
+        cout << player << " wins! Congratulations!\n";
+        string winner = (player_symbol == 1) ? player1 : player2;
+        saveGameInfo(player1, player2, winner);
+        reset_board();
+        stopTimer();
+        menu();
+        return;
+    }
     if (freezePower(player_symbol)){
         cout << "\n*** " << player << ", you have earned a FREEZE! ***\n";
         cout << "You may freeze one of the opponent's columns for their next turn.\n";
@@ -422,6 +414,7 @@ void player_movement_hard(string player, int player_symbol){
                         cout << player << " wins! Congratulations!\n";
                         winner = player;
                         saveGameInfo(player1, player2, winner);
+                        stopTimer();
                         menu();
                     }
                     
@@ -441,40 +434,7 @@ void player_movement_hard(string player, int player_symbol){
         }
     }
     if (!usedGoPower){ // if the player has not used their GO power-up, proceed with normal move selection
-        cout << player << " enter a number from 1 - 7: ";
-        int move;
-        bool validMove = false;
-        while(!validMove){
-            cin >> move;
-            // Error Checking
-            if (cin.fail()){
-                cout << "Error!";
-                cin.clear();
-                cin.ignore(1000, '\n');
-                continue;
-                }
-            if(move >= 1 && move <= WIDTH) validMove = true;
-            else cout << "\nPlease select again: ";
-        }
-        int number = 0;
-        while (board_info[(HEIGHT - 1) - number][(move - 1)] != 0){
-            number++;
-            if (number > (HEIGHT - 1)){
-                cout << "\nPlease select again: ";
-                cin >> move;
-                if (cin.fail()){
-                    cout << "Error!";
-                    cin.clear();
-                    cin.ignore(1000, '\n');
-                    continue;
-                }
-                number = 0; // reset
-            }
-        }
-        board_info[(HEIGHT - 1) - number][move - 1] = player_symbol;
-        LastMoveY = (HEIGHT - 1) - number;
-        LastMoveX = move - 1;
-        Move m = {LastMoveX, LastMoveY};
+        player_movement_medium(player, player_symbol); // call the medium difficulty movement function to allow the player to make their move and potentially use the freeze power-up if they have it
         bool earnedGoPowerpl1 = false, earnedGoPowerpl2 = false;
         if (player_symbol ==1) {
             earnedGoPowerpl1 = goPowerEarned(player_symbol);
@@ -482,6 +442,5 @@ void player_movement_hard(string player, int player_symbol){
         else if(player_symbol == 2){
             earnedGoPowerpl2 = goPowerEarned(player_symbol);
         }
-        saveGameMoves(getGameNumber(), player_symbol, move, LastMoveY); // log using 1-based column and row           
     }
 }

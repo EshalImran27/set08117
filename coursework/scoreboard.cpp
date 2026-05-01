@@ -6,13 +6,13 @@ void scoreboard(){
     if (!file.is_open()){
         cout << "Error: Could not open game_log.csv for reading." << endl;
     }
+    // Check if the file is empty (i.e., no games recorded yet)
     if(file.peek() == ifstream::traits_type::eof()){
         cout << "No games recorded yet." << endl;
         file.close();
     }
     else{
         string line;
-
         cout << left << setw(12) << "GameNumber" << setw(28) << "DateTime" << setw(16) << "Player1" << setw(16) << "Player2" << setw(16) << "Winner" << setw(12) << "GameMode" << endl;
         cout << string(12 + 28 + 16 + 16 + 16 + 12, '-') << endl;
         getline(file, line); // skip header

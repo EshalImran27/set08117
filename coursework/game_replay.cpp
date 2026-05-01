@@ -1,5 +1,11 @@
 #include "globals.h"
-
+// The gameReplay function takes a game number as input and replays the moves of that game on the console.
+// It first reads the game_log.csv file to find the details of the game (players, winner, game mode) based
+// on the provided game number. If the game is found, it then reads through the game_moves.csv file and 
+// applies each move of that game to an empty board, showing the updated board after each move with a 
+// short delay in between to create a replay effect. The function also handles undo moves and freeze 
+// actions appropriately during the replay. After the replay is finished, it prompts the user to either 
+// return to the menu or exit the program.
 void gameReplay(int gameNumber){
     ifstream gamefile("game_log.csv");
     if (!gamefile.is_open()){
@@ -43,16 +49,10 @@ void gameReplay(int gameNumber){
     }
     string line;
     cout << "Replaying game " << gameNumber << "...\n";
-    // clear board once before replay
-    for(int i=0;i<HEIGHT;i++){
-        for(int j=0;j<WIDTH;j++){
-            board_info[i][j] = 0;
-        }
-    }
+    reset_board(); // clear board before replay
     system("cls");
-    winningCells.clear(); // clear winning cells in case replaying a game right after another one where there was a win, to avoid incorrectly highlighting pieces from the previous game
     draw_board();
-    Sleep(1000);
+    Sleep(800);
 // read each line in the file and when the game number matches the one we want to replay, make the move on the board and show the updated board;
 // if game number doesn't match, skip the line
     while(getline(infile, line)){
@@ -78,8 +78,19 @@ void gameReplay(int gameNumber){
         }else if(actionStr == "FREEZE"){
             frozenColumn = col - 1; // set the global frozenColumn variable; log is saved using 1-based column so convert to 0-based for indexing
 
+        }else if(actionStr == "GO"){
+            board_info[row][col - 1] = symbol; // place the GO piece on the board; log is saved using 1-based column and row so convert to 0-based for indexing the board
+            // convert adjacent pieces of the opponent to the current player's symbol
+            for(int i = row - 1; i <= row + 1; i+=2){
+                for(int j = col - 2; j <= col; j+=2){
+                    if(i >= 0 && i < HEIGHT && j >= 0 && j < WIDTH){ // check bounds
+                        if(board_info[i][j] != 0 && board_info[i][j] != symbol){ // if there's an opponent's piece
+                        board_info[i][j] = symbol; // convert it to the current player's symbol
+                        }
+                    }
+                }
+            }
         }else {
-        //if(action == "MOVE"){
             int num = 0;
             // a simple gravity fall check
             while(num <= HEIGHT - 1 && board_info[(HEIGHT - 1) - num][(col - 1)] != 0){
@@ -92,7 +103,7 @@ void gameReplay(int gameNumber){
         }
         system("cls");
         draw_board();
-        Sleep(1000);
+        Sleep(800);
     }
     infile.close();
     cout << "Replay finished.\n";

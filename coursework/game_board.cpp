@@ -44,4 +44,18 @@ void reset_board(){
     goPowerP2 = false; // reset player 2 GO power for next game
     goPowerusedP1 = false; // reset player 1 GO power usage for next game
     goPowerusedP2 = false; // reset player 2 GO power usage for next game
+    undoStackPlayer1 = stack<Move>(); // clear player 1 undo stack for next game
+    redoStackPlayer1 = stack<Move>(); // clear player 1 redo stack for next game
+    undoStackPlayer2 = stack<Move>(); // clear player 2 undo stack for next game
+    redoStackPlayer2 = stack<Move>(); // clear player 2 redo stack for next game
+}
+
+void printTimer(){
+    if(!timeMode) return; // if not in time mode, don't print timer
+    int t=timeLeftSeconds;
+    int min = t/60;
+    int sec = t%60;
+    // print the time left in the format "Time left: mm:ss", with a leading zero for minutes and seconds if they are less than 10
+    cout << "\nTime left: " 
+        << (min<10?"0":"") << min << "m " << (sec<10?"0":"") << sec << "s\n";
 }

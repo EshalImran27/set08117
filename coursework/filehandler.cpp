@@ -1,5 +1,8 @@
 #include "globals.h"
 
+// The file handling functions are responsible for saving the moves of the game as they are made to a file 
+//named "game_moves.csv" and saving the overall game information (players, winner, game mode, etc.) to a 
+//file named "game_log.csv" at the end of each game.
 bool saveGameMoves(int gameNumber, int player_symbol,  int column,  int row, string action){
     string movesFilename = "game_moves.csv";
     ofstream outfile("game_moves.csv", ios::app);
@@ -12,9 +15,10 @@ bool saveGameMoves(int gameNumber, int player_symbol,  int column,  int row, str
     outfile.close();
     return true;
 }
-
+// The getGameNumber function reads the game_log.csv file to determine the current game number by 
+// counting the number of lines in the file (excluding the header) and adding 1. This ensures that each new 
+//game gets a unique, sequential game number for logging purposes.
 int getGameNumber(){
-    // the game number corresponds to the number of lines in the game_log.csv file (excluding header) + 1
     ifstream infile("game_log.csv");
     int gameNum = 0;
     if(infile){
@@ -69,6 +73,13 @@ bool saveGameInfo(string player1, string player2, string winner){
     return true;
 }
 
+// The cleanUnsavedMoves function is called at the start of the menu function to clean up any moves that 
+// were logged to game_moves.csv for games that were never completed and thus never had their game 
+// information logged to game_log.csv, to avoid having moves in the game_moves.csv file that don't 
+// correspond to any actual games in the game_log.csv file. It does this by first reading the game_log.csv 
+// file to find the highest valid game number, then reading through the game_moves.csv file and keeping only 
+// the moves that have a game number less than or equal to that highest valid game number, and finally 
+// writing those valid moves back to the game_moves.csv file (overwriting it).
 void cleanUnsavedMoves(){
     ifstream logFile("game_log.csv");
     int lastGameNum = 0;
