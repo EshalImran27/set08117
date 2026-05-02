@@ -10,8 +10,6 @@
 #include <stack> // for undo/redo stacks
 #include <cctype> // for isdigit function
 #include <vector> // for storing winning cell coordinates
-#include <thread> // for timer thread
-#include <chrono> // for time calculations in timer thread
 using namespace std; 
 
 // Global variables
